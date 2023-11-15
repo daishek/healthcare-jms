@@ -28,10 +28,15 @@ public class DoctorDevice {
             conn = connFactory.createConnection();
             conn.start();
 
+            System.out.println("|------------------------");
+            System.out.println("| DoctorID: #" + doctorID);
+            System.out.println("| Doctor Zone: " + doctorID);
+            System.out.println("|------------------------");
+
             session = conn.createSession(useTransaction, Session.AUTO_ACKNOWLEDGE);
 
             /* produce doctor's validation */
-            destination = session.createTopic("DoctorsTopic");
+            destination = session.createTopic("MedicalSystem.Doctors." + doctorID);
             producer = session.createProducer(destination);
 
             MapMessage doctorData = session.createMapMessage();
@@ -53,7 +58,9 @@ public class DoctorDevice {
             alertConsumer.setMessageListener(message -> {
                 try {
                         // alert message here
+                        System.out.println("***********************");
                         System.out.println("Recieved an alert");
+                        System.out.println("***********************");
  
                     } catch (Exception e) {
                         e.printStackTrace();

@@ -37,12 +37,12 @@ public class App {
 
 
             // listent to doctors ...
-            Topic doctorsTopic = session.createTopic("DoctorsTopic");
+            Topic doctorsTopic = session.createTopic("MedicalSystem.Doctors.>");
             doctorConsumer = session.createConsumer(doctorsTopic);
             doctorConsumer.setMessageListener(this::handleDoctorMsgListner);
             
             // listent to patients ...
-            Topic patientsTopic = session.createTopic("PatientTopic");
+            Topic patientsTopic = session.createTopic("MedicalSystem.Patients.>");
             patientConsumer = session.createConsumer(patientsTopic);
             patientConsumer.setMessageListener(this::handlePatientMsgListner);
         
@@ -60,17 +60,21 @@ public class App {
                 boolean docIsValid = doctorsData.getBoolean("IS_VALID");
                 Destination replyTo = doctorsData.getJMSReplyTo();
 
+                System.out.println("---------------------------");
                 System.out.println("One doctor joind the topic");
                 System.out.println("Received Doctor Data: #" + docID + ", Zone-" + docZone + ", IsValid: " + docIsValid);
                 System.out.println("waiting reply to :" + replyTo);
+                System.out.println("---------------------------");
 
                 // create Doctor
                 Doctor doctor = new Doctor(docID, docZone, docIsValid, replyTo);
                 
                 // add doctor to list doctors
                 addValidDoctor(doctor);
+                System.out.println("---------------------------");
                 System.out.println("Successfully added to valid list");
                 System.out.println("Number of valid doctors: " + validDoctors.size());
+                System.out.println("---------------------------");
             } catch (Exception e) {
                 e.printStackTrace();
             }
@@ -86,16 +90,19 @@ public class App {
                         int heartRate = mapMessage.getInt("heart-rate");
                         String zone = mapMessage.getString("zone");
         
+                        System.out.println("---------------------------");
                         System.out.println("Received Patient Data:");
                         System.out.println("Temperature: " + temperature + " °C");
                         System.out.println("Heart Rate: " + heartRate + " bpm");
                         System.out.println("Zone: Zone-" + zone + " bpm");
+                        System.out.println("---------------------------");
         
                         // Check if the values are outside of the normal range
                         if (temperature > 38 || temperature < 36 || heartRate > 100 || heartRate < 60) {
                             // alert doctors => lunche DoctorProducer to produce alert messages to DoctorConsumer
+                            System.out.println("---------------------------");
                             System.out.println("Patient in trouble - Alert medical staff or call emergency services.");
-                            
+                            System.out.println("---------------------------");
                             // allert the main app for urgent patient
                             notifyDoctor(zone);
                     } else {
@@ -138,6 +145,7 @@ public class App {
                 TextMessage msg = session.createTextMessage("Urgent case! Please attend immediately.");
                 producer.send(msg);
                 System.out.println("Sent urgent alert to Doctor #" + chosenDoctor.getID());
+                System.out.println("---------------------------");
             } catch (JMSException e) {
                 System.out.println("Something went wrong!");
                 // System.out.println("ERROR -> " + e);

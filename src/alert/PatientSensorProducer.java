@@ -4,6 +4,8 @@ import javax.jms.*;
 import org.apache.activemq.ActiveMQConnection;
 import org.apache.activemq.ActiveMQConnectionFactory;
 
+import java.util.UUID;
+
 public class PatientSensorProducer {
     public PatientSensorProducer(float temperature, int hearRate, String zone) {
         ConnectionFactory connFactory;
@@ -11,13 +13,22 @@ public class PatientSensorProducer {
         boolean useTransaction = false;
         MessageProducer producer = null;
         Session session = null;
+
+        String patientID = UUID.randomUUID().toString();
         try {
             connFactory = new ActiveMQConnectionFactory(ActiveMQConnection.DEFAULT_BROKER_URL);
             conn = connFactory.createConnection();
             conn.start();
 
+            System.out.println("|------------------------");
+            System.out.println("| PatientID: #" + patientID);
+            System.out.println("| Patient Zone: " + zone);
+            System.out.println("| Patient Temperature: " + temperature);
+            System.out.println("| Patient Heart beat: " + hearRate);
+            System.out.println("|------------------------");
+
             session = conn.createSession(useTransaction, Session.AUTO_ACKNOWLEDGE);
-            Destination queue = session.createTopic("PatientTopic");
+            Destination queue = session.createTopic("MedicalSystem.Patients.>" + patientID );
             producer = session.createProducer(queue);
 
             
